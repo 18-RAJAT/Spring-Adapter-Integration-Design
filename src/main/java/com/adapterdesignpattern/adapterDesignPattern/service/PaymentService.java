@@ -1,38 +1,45 @@
-package com.adapterdesignpattern.adapterDesignPattern.service;
+    package com.adapterdesignpattern.adapterDesignPattern.service;
 
-import com.adapterdesignpattern.adapterDesignPattern.adapter.GPayAdapter;
-import com.adapterdesignpattern.adapterDesignPattern.adapter.PayPalAdapter;
-import com.adapterdesignpattern.adapterDesignPattern.adapter.StripeAdapter;
-import com.adapterdesignpattern.adapterDesignPattern.adapter.PhonePeAdapter;
+    import com.adapterdesignpattern.adapterDesignPattern.adapter.PayPalAdapter;
+    import com.adapterdesignpattern.adapterDesignPattern.request.PaymentRequest;
+    import com.adapterdesignpattern.adapterDesignPattern.response.PaymentResponse;
 
-import com.adapterdesignpattern.adapterDesignPattern.processor.PaymentProcessor;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
 
-import com.adapterdesignpattern.adapterDesignPattern.request.PaymentRequest;
-import com.adapterdesignpattern.adapterDesignPattern.response.PaymentResponse;
+    import java.util.Random;
 
-import org.springframework.stereotype.Service;
+    @Service
+    public class PaymentService {
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+        @Autowired
+        private PayPalAdapter gPayAdapter;
 
+        @Autowired
+        private PayPalAdapter payPalAdapter;
 
-@Service
-public class PaymentService {
-    //private final Map<String,PaymentProcessor>paymentProcessorMap;
-    private Map<String,PaymentProcessor>paymentProcessorMap;
-    public PaymentService(List<PaymentProcessor>paymentProcessors)
-    {
-        paymentProcessorMap=paymentProcessors.stream()
-                .collect(Collectors.toMap(processor -> processor.getClass().getSimpleName(),Function.identity()));
+        @Autowired
+        private PayPalAdapter stripeAdapter;
+
+        public PaymentResponse processPayment(String gateway, PaymentRequest paymentRequest) {
+            PayPalAdapter processor = null;
+
+            switch (gateway.toLowerCase()) {
+                case "paypal":
+                    processor = payPalAdapter;
+                    break;
+                case "stripe":
+                    processor = stripeAdapter;
+                    break;
+                case "gpay":
+                    processor = gPayAdapter;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported payment gateway: " + gateway);
+            }
+
+            // Process the payment and ret  urn a response
+            processor.makePayment(paymentRequest.getAmount());
+            return new PaymentResponse(true, new Random().nextLong(10000000L));
+        }
     }
-
-    public PaymentResponse processPayment(String gateway,PaymentRequest paymentRequest)
-    {
-        PaymentProcessor paymentProcessor=paymentProcessorMap.get(gateway+" Adapter");
-        paymentProcessor.makePayment(paymentRequest.amount());
-        return new PaymentResponse(true,new Random().nextLong(10000000L));
-    }
-}
