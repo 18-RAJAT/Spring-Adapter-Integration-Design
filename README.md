@@ -1,7 +1,7 @@
 # Adapter Design Pattern with Spring Boot
 
 ## Overview
-This project demonstrates the **Adapter Design Pattern** using a Spring Boot application. The example focuses on integrating multiple payment gateways (e.g., PayPal, Stripe, Razorpay, Google Pay) through a unified adapter, making the application more maintainable, scalable, and adaptable to future changes.
+This project demonstrates the **Adapter Design Pattern** using a Spring Boot application. The example focuses on integrating multiple payment gateways (e.g., PayPal, Stripe, Razorpay, Google Pay) through a unified adapter, making the application more maintainable, scalable and adaptable to future changes.
 
 ## Key Features
 - **Unified Integration**: A single adapter interface to interact with multiple payment gateways
